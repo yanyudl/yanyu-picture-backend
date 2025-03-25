@@ -95,7 +95,7 @@ public class UserController {
     }
 
     /**
-     * 根据id获取用户（仅管理员 为脱敏）
+     * 根据id获取用户（仅管理员  未脱敏）
      */
     @GetMapping("/get")
     @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
@@ -130,10 +130,9 @@ public class UserController {
     }
 
     /**
-     * 更新用户（仅管理员）
+     * 更新用户
      */
     @PostMapping("/update")
-    @AuthCheck(mustRole = UserConstant.ADMIN_ROLE)
     public BaseResponse<Boolean> updateUser(@RequestBody UserUpdateRequest userUpdateRequest) {
         ThrowUtils.throwIf(userUpdateRequest == null, ErrorCode.PARAMS_ERROR);
         User user = new User();
