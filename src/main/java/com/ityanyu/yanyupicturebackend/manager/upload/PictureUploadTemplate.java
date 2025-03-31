@@ -65,6 +65,7 @@ public abstract class PictureUploadTemplate {
             processFile(inputSource, file);
             // 4. 上传图片到对象存储
             PutObjectResult putObjectResult = cosManager.putPictureObject(uploadPath, file);
+            String imageAve = cosManager.getImageAve(uploadPath);
             ImageInfo imageInfo = putObjectResult.getCiUploadResult().getOriginalInfo().getImageInfo();
             //取到修改后的结果
             ProcessResults processResults = putObjectResult.getCiUploadResult().getProcessResults();
@@ -78,10 +79,10 @@ public abstract class PictureUploadTemplate {
                     thumbnailCiObject = objectList.get(1);
                 }
                 //封装压缩图返回结果
-                return buildResult(originFilename,compressdCiObject,thumbnailCiObject);
+                return buildResult(originFilename,compressdCiObject,thumbnailCiObject,imageAve);
             }
             // 5. 封装返回结果
-            return buildResult(originFilename, file, uploadPath, imageInfo);
+            return buildResult(originFilename, file, uploadPath, imageInfo,imageAve);
         } catch (Exception e) {
             log.error("图片上传到对象存储失败", e);
             throw new BusinessException(ErrorCode.SYSTEM_ERROR, "上传失败");
@@ -114,7 +115,7 @@ public abstract class PictureUploadTemplate {
      * @return
      */
     private UploadPictureResult buildResult(String originFilename, CIObject compressdCiObject,
-                                            CIObject thumbnailCiObject) {
+                                            CIObject thumbnailCiObject,String imageAve) {
         //封装返回结果
         //计算宽高比
         int picWidth = compressdCiObject.getWidth();
@@ -130,6 +131,7 @@ public abstract class PictureUploadTemplate {
         uploadPictureResult.setPicHeight(picHeight);
         uploadPictureResult.setPicScale(picScale);
         uploadPictureResult.setPicFormat(compressdCiObject.getFormat());
+        uploadPictureResult.setPicColor(imageAve);
         return uploadPictureResult;
     }
     /**
@@ -141,7 +143,7 @@ public abstract class PictureUploadTemplate {
      * @param imageInfo
      * @return
      */
-    private UploadPictureResult buildResult(String originFilename, File file, String uploadPath, ImageInfo imageInfo) {
+    private UploadPictureResult buildResult(String originFilename, File file, String uploadPath, ImageInfo imageInfo, String imageAve) {
         //封装返回结果
         //计算宽高比
         int picWidth = imageInfo.getWidth();
@@ -156,6 +158,7 @@ public abstract class PictureUploadTemplate {
         uploadPictureResult.setPicHeight(picHeight);
         uploadPictureResult.setPicScale(picScale);
         uploadPictureResult.setPicFormat(imageInfo.getFormat());
+        uploadPictureResult.setPicColor(imageAve);
         return uploadPictureResult;
     }
 

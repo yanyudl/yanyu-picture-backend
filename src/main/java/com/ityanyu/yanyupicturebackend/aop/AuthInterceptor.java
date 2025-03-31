@@ -1,15 +1,11 @@
 package com.ityanyu.yanyupicturebackend.aop;
 
 import com.ityanyu.yanyupicturebackend.annotation.AuthCheck;
-import com.ityanyu.yanyupicturebackend.constant.UserConstant;
-import com.ityanyu.yanyupicturebackend.exception.BusinessException;
 import com.ityanyu.yanyupicturebackend.exception.ErrorCode;
 import com.ityanyu.yanyupicturebackend.exception.ThrowUtils;
 import com.ityanyu.yanyupicturebackend.model.entity.User;
 import com.ityanyu.yanyupicturebackend.model.enums.UserRoleEnum;
 import com.ityanyu.yanyupicturebackend.service.UserService;
-import net.bytebuddy.asm.Advice;
-import net.bytebuddy.implementation.bytecode.Throw;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -56,10 +52,10 @@ public class AuthInterceptor {
         //获取用户当前的权限
         UserRoleEnum userRoleEnum = UserRoleEnum.getEnumByValue(loginUser.getUserRole());
         //无权限，拒绝
-        ThrowUtils.throwIf(userRoleEnum     == null, ErrorCode.NOT_AUTH_ERROR);
+        ThrowUtils.throwIf(userRoleEnum     == null, ErrorCode.NO_AUTH_ERROR);
         //需要管理员权限，但用户没有管理员权限，拒绝
         ThrowUtils.throwIf(UserRoleEnum.ADMIN.equals(mustRoleEnum) && !UserRoleEnum.ADMIN.equals(userRoleEnum),
-                ErrorCode.NOT_AUTH_ERROR);
+                ErrorCode.NO_AUTH_ERROR);
         //通过权限校验
         return joinPoint.proceed();
     }

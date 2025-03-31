@@ -4,10 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.ityanyu.yanyupicturebackend.common.BaseResponse;
 import com.ityanyu.yanyupicturebackend.common.PageRequest;
-import com.ityanyu.yanyupicturebackend.model.dto.picture.PictureQueryRequest;
-import com.ityanyu.yanyupicturebackend.model.dto.picture.PictureReviewRequest;
-import com.ityanyu.yanyupicturebackend.model.dto.picture.PictureUploadByBatchRequest;
-import com.ityanyu.yanyupicturebackend.model.dto.picture.PictureUploadRequest;
+import com.ityanyu.yanyupicturebackend.model.dto.picture.*;
 import com.ityanyu.yanyupicturebackend.model.dto.user.UserQueryRequest;
 import com.ityanyu.yanyupicturebackend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -47,7 +44,7 @@ public interface PictureService extends IService<Picture> {
     QueryWrapper<Picture> getQueryWrapper(PictureQueryRequest pictureQueryRequest);
 
     /**
-     * 获取脱敏后的单个图片信息
+     * 获取脱敏后的单个图片信息（单条）
      *
      * @param picture
      * @param request
@@ -56,7 +53,7 @@ public interface PictureService extends IService<Picture> {
     PictureVO getPictureVO(Picture picture, HttpServletRequest request);
 
     /**
-     * 获取脱敏后的图片信息列表
+     * 获取脱敏后的图片信息列表（分页）
      *
      * @param picturePage
      * @param request
@@ -115,9 +112,54 @@ public interface PictureService extends IService<Picture> {
      */
     Picture getPictureVOById(Long id);
 
-    /*
-    * 删除图片文件
-    * */
+    /**
+     * 清理图片文件（指对象存储中的对象）
+     *
+     * @param oldPicture
+     */
     void clearPictureFile(Picture oldPicture);
+
+    /**
+     * 校验空间图片的权限
+     *
+     * @param loginUser
+     * @param picture
+     */
+    void checkPictureAuth(User loginUser, Picture picture);
+
+    /**
+     * 删除图片
+     *
+     * @param pictureId
+     * @param loginUser
+     */
+    void deletePicture(long pictureId, User loginUser);
+
+    /**
+     * 编辑图片
+     *
+     * @param pictureEditRequest
+     * @param loginUser
+     */
+    void editPicture(PictureEditRequest pictureEditRequest, User loginUser);
+
+    /**
+     * 根据颜色搜索图片
+     *
+     * @param spaceId
+     * @param picColor
+     * @param loginUser
+     * @return
+     */
+    List<PictureVO> searchPictureByColor(Long spaceId,String picColor,User loginUser);
+
+    /**
+     * 批量编辑图片的分类和标签
+     *
+     * @param pictureEditByBatchRequest
+     * @param loginUser
+     * @return
+     */
+    void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
 }
 
