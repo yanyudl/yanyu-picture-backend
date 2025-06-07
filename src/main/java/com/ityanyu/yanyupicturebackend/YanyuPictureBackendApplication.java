@@ -1,5 +1,6 @@
 package com.ityanyu.yanyupicturebackend;
 
+import org.apache.shardingsphere.spring.boot.ShardingSphereAutoConfiguration;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -8,7 +9,7 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {ShardingSphereAutoConfiguration.class})
 @EnableAsync
 @MapperScan("com.ityanyu.yanyupicturebackend.mapper")
 @EnableAspectJAutoProxy(exposeProxy = true)

@@ -47,6 +47,11 @@ public class CosManager {
     public PutObjectResult putObject(String key, File file) {
         PutObjectRequest putObjectRequest = new PutObjectRequest(cosClientConfig.getBucket(), key,
                 file);
+        //对图片进行处理
+        PicOperations picOperations = new PicOperations();
+        //1 表示返回原图信息
+        picOperations.setIsPicInfo(1);
+        putObjectRequest.setPicOperations(picOperations);
         return cosClient.putObject(putObjectRequest);
     }
 

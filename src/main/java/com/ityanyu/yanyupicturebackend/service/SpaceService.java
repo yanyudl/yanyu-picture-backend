@@ -2,6 +2,7 @@ package com.ityanyu.yanyupicturebackend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.ityanyu.yanyupicturebackend.common.DeleteRequest;
 import com.ityanyu.yanyupicturebackend.model.dto.space.SpaceAddRequest;
 import com.ityanyu.yanyupicturebackend.model.dto.space.SpaceQueryRequest;
 import com.ityanyu.yanyupicturebackend.model.entity.Space;
@@ -67,4 +68,20 @@ public interface SpaceService extends IService<Space> {
      * @param space
      */
     void fillSpaceBySpaceLevel(Space space);
+
+    /**
+     * 空间权限校验
+     *
+     * @param loginUser
+     * @param space
+     */
+    void checkSpaceAuth(User loginUser, Space space);
+
+    /**
+     * 删除空间
+     *
+     * @param deleteRequest
+     * @param request
+     */
+    void deleteSpace(DeleteRequest deleteRequest, HttpServletRequest request);
 }

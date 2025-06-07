@@ -2,15 +2,12 @@ package com.ityanyu.yanyupicturebackend.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.ityanyu.yanyupicturebackend.common.BaseResponse;
-import com.ityanyu.yanyupicturebackend.common.PageRequest;
+import com.ityanyu.yanyupicturebackend.api.aliyunai.model.CreateOutPaintingTaskResponse;
 import com.ityanyu.yanyupicturebackend.model.dto.picture.*;
-import com.ityanyu.yanyupicturebackend.model.dto.user.UserQueryRequest;
 import com.ityanyu.yanyupicturebackend.model.entity.Picture;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.ityanyu.yanyupicturebackend.model.entity.User;
 import com.ityanyu.yanyupicturebackend.model.vo.PictureVO;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -161,5 +158,14 @@ public interface PictureService extends IService<Picture> {
      * @return
      */
     void editPictureByBatch(PictureEditByBatchRequest pictureEditByBatchRequest, User loginUser);
+
+    /**
+     * 创建扩图任务
+     *
+     * @param createPictureOutPaintingTaskRequest
+     * @param loginUser
+     * @return
+     */
+    CreateOutPaintingTaskResponse createPictureOutPaintingTask(CreatePictureOutPaintingTaskRequest createPictureOutPaintingTaskRequest, User loginUser);
 }
 

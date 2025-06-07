@@ -22,7 +22,7 @@ public class LocalCacheManager {
         this.localCache = Caffeine.newBuilder()
                 .initialCapacity(1024)
                 .maximumSize(10000L)
-                .expireAfterWrite(5, TimeUnit.MINUTES)
+                .expireAfterWrite(1, TimeUnit.MINUTES)
                 .build();
     }
 

@@ -10,14 +10,17 @@ import com.ityanyu.yanyupicturebackend.constant.UserConstant;
 import com.ityanyu.yanyupicturebackend.exception.BusinessException;
 import com.ityanyu.yanyupicturebackend.exception.ErrorCode;
 import com.ityanyu.yanyupicturebackend.exception.ThrowUtils;
+import com.ityanyu.yanyupicturebackend.manager.auth.SpaceUserAuthManager;
 import com.ityanyu.yanyupicturebackend.model.dto.space.*;
 import com.ityanyu.yanyupicturebackend.model.entity.Space;
 import com.ityanyu.yanyupicturebackend.model.entity.User;
 import com.ityanyu.yanyupicturebackend.model.enums.SpaceLevelEnum;
+import com.ityanyu.yanyupicturebackend.model.enums.SpaceTypeEnum;
 import com.ityanyu.yanyupicturebackend.model.vo.SpaceVO;
 import com.ityanyu.yanyupicturebackend.service.SpaceService;
 import com.ityanyu.yanyupicturebackend.service.UserService;
 import org.springframework.beans.BeanUtils;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -42,13 +45,19 @@ public class SpaceController {
     @Resource
     private UserService userService;
 
+    @Resource
+    private SpaceUserAuthManager spaceUserAuthManager;
+
+    @Resource
+    private TransactionTemplate transactionTemplate;
+
     /**
      * 创建空间
      */
     @PostMapping("/add")
     public BaseResponse<Long> addSpace(@RequestBody SpaceAddRequest spaceAddRequest, HttpServletRequest request) {
         ThrowUtils.throwIf(spaceAddRequest == null,ErrorCode.PARAMS_ERROR);
-        User loginUser = userService.getUserLogin(request);
+        User loginUser = userService.getLoginUser(request);
         long newSpaceId = spaceService.addSpace(spaceAddRequest, loginUser);
         return ResultUtils.success(newSpaceId);
     }
@@ -61,18 +70,8 @@ public class SpaceController {
         if (deleteRequest == null || deleteRequest.getId() <= 0) {
             throw new BusinessException(ErrorCode.PARAMS_ERROR);
         }
-        User loginUser = userService.getUserLogin(request);
-        Long id = deleteRequest.getId();
-        //判断是否存在
-        Space oldSpace = spaceService.getById(id);
-        ThrowUtils.throwIf(oldSpace == null, ErrorCode.NOT_FOUND_ERROR);
+        spaceService.deleteSpace(deleteRequest,request);
 
-        //仅本人和管理员可以删除
-        ThrowUtils.throwIf(!oldSpace.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)
-                , ErrorCode.NO_AUTH_ERROR);
-        //操作数据库
-        boolean result = spaceService.removeById(id);
-        ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);
         return ResultUtils.success(true);
     }
 
@@ -126,8 +125,13 @@ public class SpaceController {
         //查询数据库
         Space space = spaceService.getById(id);
         ThrowUtils.throwIf(space == null, ErrorCode.NOT_FOUND_ERROR);
+        SpaceVO spaceVO = spaceService.getSpaceVO(space, request);
+        User loginUser = userService.getLoginUser(request);
+        //获取权限列表
+        List<String> permissionList = spaceUserAuthManager.getPermissionList(space, loginUser);
+        spaceVO.setPermissionList(permissionList);
         // 获取封装类
-        return ResultUtils.success(spaceService.getSpaceVO(space, request));
+        return ResultUtils.success(spaceVO);
     }
 
     /**
@@ -180,14 +184,12 @@ public class SpaceController {
         space.setEditTime(new Date());
         // 数据校验
         spaceService.validSpace(space,false);
-        User loginUser = userService.getUserLogin(request);
+        User loginUser = userService.getLoginUser(request);
         long id = spaceEditRequest.getId();
         Space oldSpace = spaceService.getById(id);
         ThrowUtils.throwIf(oldSpace == null, ErrorCode.NOT_FOUND_ERROR);
         // 仅本人或管理员可编辑
-        if (!oldSpace.getUserId().equals(loginUser.getId()) && !userService.isAdmin(loginUser)) {
-            throw new BusinessException(ErrorCode.NO_AUTH_ERROR);
-        }
+        spaceService.checkSpaceAuth(loginUser,space);
         // 操作数据库
         boolean result = spaceService.updateById(space);
         ThrowUtils.throwIf(!result, ErrorCode.OPERATION_ERROR);

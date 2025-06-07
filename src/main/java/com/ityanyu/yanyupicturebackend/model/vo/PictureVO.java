@@ -8,6 +8,7 @@ import com.ityanyu.yanyupicturebackend.model.entity.Picture;
 import lombok.Data;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -95,6 +96,11 @@ public class PictureVO implements Serializable {
     private Long spaceId;
 
     /**
+     * 审核状态：0-待审核; 1-通过; 2-拒绝
+     */
+    private Integer reviewStatus;
+
+    /**
      * 创建时间
      */
     private Date createTime;
@@ -113,6 +119,11 @@ public class PictureVO implements Serializable {
     * 创建用户信息
     * */
     private UserVO userVO;
+
+    /**
+     * 权限列表
+     */
+    private List<String> permissionList = new ArrayList<>();
 
     /**
      * vo转实体类
